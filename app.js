@@ -1,15 +1,12 @@
-require("dotenv").config();
-
 const express = require("express");
 const app = express();
-
 const db = require("./models/db");
-const Usuario = require("./models/Usuario");
+require("./models/associations");
 
-db.sequelize.sync().then(() => {
-    console.log("Banco sincronizado!");
+db.sequelize.sync({ force: false })
+    .then(() => console.log("Banco sincronizado com sucesso!"))
+    .catch(err => console.log("Erro ao sincronizar:", err));
 
-    app.listen(8081, () => {
-        console.log("Servidor ativo...");
-    });
+app.listen(8081, () => {
+    console.log("Servidor ativo...");
 });
