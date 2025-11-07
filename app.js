@@ -26,6 +26,26 @@ app.post("/usuario/cadastro", function (req, res) {
     });
 });
 
+app.post("/usuario/login", async function(req, res){
+    const { email, senha } = req.body;
+
+    try {
+        const usuario = await Usuario.findOne({ where: { email: email } });
+
+        if (!usuario) {
+            return res.status(404).send("Usuário não encontrado");
+        }
+
+        if (usuario.senha !== senha) {
+            return res.status(401).send("Senha incorreta");
+        }
+
+        res.send("Login realizado com sucesso!");
+    } catch (err) {
+        res.status(500).send("Erro ao realizar login: " + err);
+    }
+});
+
 app.get("/usuario/listar", function (req, res) {
     Usuario.findAll()
         .then((usuarios) => {
