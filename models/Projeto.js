@@ -8,6 +8,10 @@ const Projeto = db.sequelize.define("Projeto", {
     descricao: {
         type: db.Sequelize.TEXT,
         allowNull: true
+    },
+    progresso: {
+        type: db.Sequelize.FLOAT,
+        defaultValue: 0
     }
 });
 

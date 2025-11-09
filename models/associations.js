@@ -4,18 +4,30 @@ const Tarefa = require("./Tarefa");
 
 Usuario.hasMany(Projeto, {
     foreignKey: "usuarioId",
-    onDelete: "CASCADE",
+    onDelete: "CASCADE"
 });
+
 Projeto.belongsTo(Usuario, {
-    foreignKey: "usuarioId",
+    foreignKey: "usuarioId"
 });
 
 Projeto.hasMany(Tarefa, {
     foreignKey: "projetoId",
-    onDelete: "CASCADE",
+    onDelete: "CASCADE"
 });
+
 Tarefa.belongsTo(Projeto, {
-    foreignKey: "projetoId",
+    foreignKey: "projetoId"
+});
+
+Usuario.hasMany(Tarefa, {
+    foreignKey: "responsavelId",
+    onDelete: "SET NULL"
+});
+
+Tarefa.belongsTo(Usuario, {
+    foreignKey: "responsavelId",
+    as: "responsavel"
 });
 
 module.exports = { Usuario, Projeto, Tarefa };

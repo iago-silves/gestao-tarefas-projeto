@@ -1,8 +1,14 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+
 const db = require("./models/db");
 const Usuario = require("./models/Usuario");
+const Projeto = require("./models/Projeto");
+const Tarefa = require("./models/Tarefa");
+
+const recalcularProgresso = require("./utils/Progresso");
+
 require("./models/associations");
 
 db.sequelize.sync({ force: false })
@@ -108,6 +114,215 @@ app.delete("/usuario/deletar/:id", function (req, res) {
         res.send("Erro ao deletar usuário: " + erro);
     });
 });
+
+app.post("/projeto/cadastrar", async (req, res) => {
+    try {
+        const { nome, descricao, usuarioId } = req.body;
+
+        // valida se usuario existe
+        const usuario = await Usuario.findByPk(usuarioId);
+        if (!usuario) {
+            return res.status(404).send("Usuário não encontrado.");
+        }
+
+        const projeto = await Projeto.create({
+            nome,
+            descricao,
+            usuarioId
+        });
+
+        res.status(201).json({
+            mensagem: "Projeto criado com sucesso!",
+            projeto
+        });
+    } catch (err) {
+        res.status(500).send("Erro ao criar projeto: " + err);
+    }
+});
+
+app.get("/projeto/listar", async (req, res) => {
+    try {
+        const projetos = await Projeto.findAll({
+            include: [{ model: Usuario }]
+        });
+
+        res.json(projetos);
+    } catch (err) {
+        res.status(500).send("Erro ao listar projetos: " + err);
+    }
+});
+
+app.get("/projeto/:id", async (req, res) => {
+    try {
+        const projeto = await Projeto.findByPk(req.params.id, {
+            include: [{ model: Usuario }]
+        });
+
+        if (!projeto) {
+            return res.status(404).send("Projeto não encontrado.");
+        }
+
+        res.json(projeto);
+    } catch (err) {
+        res.status(500).send("Erro ao buscar projeto: " + err);
+    }
+});
+
+app.put("/projeto/atualizar/:id", async (req, res) => {
+    try {
+        const { nome, descricao, usuarioId } = req.body;
+
+        // valida se usuario existe (se enviado)
+        if (usuarioId) {
+            const usuario = await Usuario.findByPk(usuarioId);
+            if (!usuario) {
+                return res.status(404).send("Usuário informado não existe.");
+            }
+        }
+
+        const [linhasAfetadas] = await Projeto.update(
+            { nome, descricao, usuarioId },
+            { where: { id: req.params.id } }
+        );
+
+        if (linhasAfetadas === 0) {
+            return res.status(404).send("Projeto não encontrado.");
+        }
+
+        res.send("Projeto atualizado com sucesso!");
+    } catch (err) {
+        res.status(500).send("Erro ao atualizar projeto: " + err);
+    }
+});
+
+app.delete("/projeto/deletar/:id", async (req, res) => {
+    try {
+        const linhasAfetadas = await Projeto.destroy({
+            where: { id: req.params.id }
+        });
+
+        if (linhasAfetadas === 0) {
+            return res.status(404).send("Projeto não encontrado.");
+        }
+
+        res.send("Projeto deletado com sucesso!");
+    } catch (err) {
+        res.status(500).send("Erro ao deletar projeto: " + err);
+    }
+});
+
+app.post("/tarefa/cadastrar", async (req, res) => {
+    try {
+        const { titulo, descricao, projetoId, prioridade, percentual } = req.body;
+
+        const tarefa = await Tarefa.create({
+            titulo,
+            descricao,
+            projetoId,
+            prioridade,
+            percentual,
+            status: "pendente"
+        });
+
+        await recalcularProgresso(projetoId);
+
+        res.json(tarefa);
+    } catch (erro) {
+        res.status(500).send("Erro ao cadastrar tarefa: " + erro);
+    }
+});
+
+app.get("/tarefa/listar", async (req, res) => {
+    try {
+        const tarefas = await Tarefa.findAll();
+        res.json(tarefas);
+    } catch (erro) {
+        res.status(500).send("Erro ao listar tarefas: " + erro);
+    }
+});
+
+app.get("/tarefa/projeto/:projetoId", async (req, res) => {
+    try {
+        const tarefas = await Tarefa.findAll({
+            where: { projetoId: req.params.projetoId }
+        });
+        res.json(tarefas);
+    } catch (erro) {
+        res.status(500).send("Erro ao buscar tarefas: " + erro);
+    }
+});
+
+app.put("/tarefa/atualizar/:id", async (req, res) => {
+    try {
+        const { titulo, descricao, prioridade, percentual } = req.body;
+
+        const tarefa = await Tarefa.findByPk(req.params.id);
+
+        if (!tarefa) {
+            return res.status(404).send("Tarefa não encontrada");
+        }
+
+        let novoStatus = tarefa.status;
+
+        if (percentual === 100) novoStatus = "concluida";
+        else if (percentual > 0) novoStatus = "em_progresso";
+        else novoStatus = "pendente";
+
+        await tarefa.update({
+            titulo,
+            descricao,
+            prioridade,
+            percentual,
+            status: novoStatus
+        });
+
+        await recalcularProgresso(tarefa.projetoId);
+
+        res.json(tarefa);
+    } catch (erro) {
+        res.status(500).send("Erro ao atualizar tarefa: " + erro);
+    }
+});
+
+app.delete("/tarefa/deletar/:id", async (req, res) => {
+    try {
+        const tarefa = await Tarefa.findByPk(req.params.id);
+
+        if (!tarefa) {
+            return res.status(404).send("Tarefa não encontrada");
+        }
+
+        const projetoId = tarefa.projetoId;
+
+        await tarefa.destroy();
+
+        await recalcularProgresso(projetoId);
+
+        res.send("Tarefa deletada com sucesso!");
+    } catch (erro) {
+        res.status(500).send("Erro ao deletar tarefa: " + erro);
+    }
+});
+
+app.get("/tarefa/filtrar", async (req, res) => {
+    try {
+        const { status, responsavelId } = req.query;
+
+        const filtros = {};
+
+        if (status) filtros.status = status;
+        if (responsavelId) filtros.responsavelId = Number(responsavelId);
+
+        const tarefas = await Tarefa.findAll({
+            where: filtros
+        });
+
+        res.json(tarefas);
+    } catch (erro) {
+        res.status(500).send("Erro ao filtrar tarefas: " + erro);
+    }
+});
+
 
 app.listen(8081, () => {
     console.log("Servidor ativo...");

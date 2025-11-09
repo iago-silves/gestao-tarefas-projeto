@@ -1,6 +1,6 @@
 const db = require("./db");
 
-const Usuario = db.sequelize.define("usuario", {
+const Usuario = db.sequelize.define("Usuario", {
     nome: {
         type: db.Sequelize.STRING,
         allowNull: false
@@ -17,7 +17,5 @@ const Usuario = db.sequelize.define("usuario", {
     freezeTableName: true,
     tableName: "usuarios"
 });
-
-Usuario.sync({ force: false })
 
 module.exports = Usuario;

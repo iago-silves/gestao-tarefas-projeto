@@ -12,7 +12,28 @@ const Tarefa = db.sequelize.define("Tarefa", {
     status: {
         type: db.Sequelize.ENUM("pendente", "em_progresso", "concluida"),
         defaultValue: "pendente"
+    },
+    responsavelId: {
+        type: db.Sequelize.INTEGER,
+        allowNull: true
+    },
+    dataConclusao: {
+        type: db.Sequelize.DATE,
+        allowNull: true
+    },
+    prioridade: {
+        type: db.Sequelize.ENUM("baixa", "media", "alta"),
+        defaultValue: "media"
+    },
+    percentual: {
+        type: db.Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    projetoId: {
+        type: db.Sequelize.INTEGER,
+        allowNull: false
     }
 });
 
 module.exports = Tarefa;
+
