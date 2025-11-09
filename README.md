@@ -31,7 +31,7 @@ Ideal para estudos, portfólios e como base de sistemas reais de gestão.
 ### Frameworks e Ferramentas
 - **Express.js**
 - **Sequelize ORM**
-- **MySQL / PostgreSQL (via Sequelize)
+- **MySQL / PostgreSQL (via Sequelize)**
 - **dotenv**  
 - **body-parser**
 
