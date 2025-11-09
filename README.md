@@ -24,14 +24,14 @@ Ideal para estudos, portfólios e como base de sistemas reais de gestão.
 
 ## Tecnologias Utilizadas
 
-### Linguagens e Runtime
+### Linguagens
 - **Node.js**
-- **JavaScript (ES6)**
+- **JavaScript**
 
 ### Frameworks e Ferramentas
 - **Express.js**
 - **Sequelize ORM**
-- **MySQL / PostgreSQL / MariaDB** (via Sequelize)
+- **MySQL / PostgreSQL (via Sequelize)
 - **dotenv**  
 - **body-parser**
 
