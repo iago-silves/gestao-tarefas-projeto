@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const tarefaForm = document.getElementById("tarefaForm");
   const tarefasContainer = document.getElementById("tarefasContainer");
+  const projetoSelect = document.getElementById("projetoSelect");
 
   // =============== CADASTRAR NOVA TAREFA ===============
   if (tarefaForm) {
@@ -30,6 +31,25 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("Erro ao cadastrar tarefa: " + err);
       }
     });
+  }
+
+  async function carregarProjetos() {
+    if (!projetoSelect) return;
+
+    try {
+      const projetos = await apiRequest("/projeto/listar", "GET");
+      projetoSelect.innerHTML =
+        '<option value="">Selecione um projeto</option>';
+
+      projetos.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.nome;
+        projetoSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Erro ao carregar projetos:", err);
+    }
   }
 
   // =============== LISTAR TAREFAS ===============
