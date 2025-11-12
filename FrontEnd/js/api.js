@@ -1,5 +1,3 @@
-// api.js
-
 async function apiRequest(endpoint, method = "GET", data = null) {
   try {
     const options = {
