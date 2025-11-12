@@ -1,38 +1,48 @@
-const API_URL = "http://localhost:8081";
-
-async function cadastrarUsuario() {
-  const nome = cadastroNome.value;
-  const email = cadastroEmail.value;
-  const senha = cadastroSenha.value;
-
-  const res = await fetch(`${API_URL}/usuario/cadastro`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nome, email, senha }),
+// LOGIN
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = email.value;
+    const senha = senha.value;
+    const res = await apiRequest("/usuario/login", "POST", { email, senha });
+    if (res.includes("sucesso")) {
+      localStorage.setItem("userEmail", email);
+      window.location.href = "index.html";
+    } else alert(res);
   });
-
-  const data = await res.text();
-  mensagem.textContent = data.includes("sucesso")
-    ? "Usuário cadastrado!"
-    : "Erro ao cadastrar.";
 }
 
-async function login() {
-  const email = loginEmail.value;
-  const senha = loginSenha.value;
-
-  const res = await fetch(`${API_URL}/usuario/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, senha }),
+// CADASTRO
+const cadastroForm = document.getElementById("cadastroForm");
+if (cadastroForm) {
+  cadastroForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const nome = nome.value;
+    const email = email.value;
+    const senha = senha.value;
+    const res = await apiRequest("/usuario/cadastro", "POST", {
+      nome,
+      email,
+      senha,
+    });
+    alert(res);
+    if (res.includes("sucesso")) window.location.href = "login.html";
   });
+}
 
-  const data = await res.text();
+// LOGOUT
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn)
+  logoutBtn.onclick = () => {
+    localStorage.clear();
+    window.location.href = "login.html";
+  };
 
-  if (data.includes("sucesso")) {
-    localStorage.setItem("usuarioEmail", email);
-    window.location.href = "projetos.html";
-  } else {
-    mensagem.textContent = "Email ou senha inválidos!";
-  }
+// NOME DO USUÁRIO
+const userName = document.getElementById("userName");
+if (userName) {
+  const email = localStorage.getItem("userEmail");
+  if (!email) window.location.href = "login.html";
+  else userName.textContent = email;
 }
