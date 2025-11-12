@@ -1,0 +1,15 @@
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.progress {
+  height: 8px;
+}
+
+.btn {
+  border-radius: 6px;
+}
