@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const bodyParser = require("body-parser");
 
@@ -17,6 +18,8 @@ db.sequelize.sync({ force: false })
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+app.use(cors());
 
 app.post("/usuario/cadastro", function (req, res) {
     Usuario.create({
