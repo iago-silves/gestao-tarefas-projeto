@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const descricao = document.getElementById("descricaoTarefa").value;
       const projetoId = document.getElementById("projetoSelect").value;
       const prioridade = document.getElementById("prioridadeTarefa").value;
-
+      const status = document.getElementById("statusTarefa").value;
       try {
         if (editandoTarefaId) {
           // Atualizar tarefa existente
@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             projetoId,
             prioridade,
             percentual: 0,
-            status: document.getElementById("statusTarefa").value,
+            status,
           });
 
           alert("Tarefa atualizada com sucesso!");
@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             projetoId,
             prioridade,
             percentual: 0,
-            status: document.getElementById("statusTarefa").value,
+            status,
           });
 
           alert("Tarefa cadastrada com sucesso!");
