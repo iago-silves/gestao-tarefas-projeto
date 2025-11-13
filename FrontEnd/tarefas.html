@@ -3,146 +3,192 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Gerenciador de Projetos — Tarefas</title>
-
-    <!-- Bootstrap CSS -->
+    <title>Tarefas</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    </style>
+    <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
-    <!-- ================= NAVBAR ================= -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand fw-bold" href="#">Gerenciador de Projetos</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Alternar navegação"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="dashboard.html">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="projetos.html">Projetos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="tarefas.html">Tarefas</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="login.html">Sair</a>
-            </li>
-          </ul>
-        </div>
-      </div>
+    <nav class="navbar navbar-dark bg-dark px-3">
+      <a href="index.html" class="navbar-brand">Gestor de Projetos</a>
+      <button class="btn btn-outline-light" id="logoutBtn">Sair</button>
     </nav>
 
-    <!-- ================= CONTEÚDO ================= -->
     <div class="container mt-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h3 class="fw-bold">Tarefas</h3>
-        <button
-          id="novaTarefaBtn"
-          class="btn btn-success"
-          data-bs-toggle="modal"
-          data-bs-target="#tarefaModal"
-        >
-          + Nova Tarefa
-        </button>
-      </div>
+      <h3>Tarefas</h3>
+      <button
+        class="btn btn-success mb-3"
+        id="novaTarefaBtn"
+        data-bs-toggle="modal"
+        data-bs-target="#modalNovaTarefa"
+      >
+        + Nova Tarefa
+      </button>
 
-      <!-- Lista de tarefas -->
-      <div id="tarefasContainer">
-        <p class="text-muted">Carregando tarefas...</p>
-      </div>
+      <div id="tarefasContainer" class="row g-3"></div>
     </div>
 
-    <!-- ================= MODAL DE TAREFA ================= -->
+    <!-- =================== MODAL DE NOVA TAREFA =================== -->
     <div
       class="modal fade"
-      id="tarefaModal"
+      id="modalNovaTarefa"
       tabindex="-1"
-      aria-labelledby="tarefaModalLabel"
+      aria-labelledby="modalNovaTarefaLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="tarefaModalLabel">Nova Tarefa</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Fechar"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="tarefaForm">
+          <form id="tarefaForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalNovaTarefaLabel">Nova Tarefa</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Fechar"
+              ></button>
+            </div>
+            <div class="modal-body">
               <div class="mb-3">
                 <label for="tituloTarefa" class="form-label">Título</label>
                 <input
                   type="text"
-                  id="tituloTarefa"
                   class="form-control"
-                  placeholder="Digite o título da tarefa"
+                  id="tituloTarefa"
                   required
                 />
               </div>
-
               <div class="mb-3">
                 <label for="descricaoTarefa" class="form-label"
                   >Descrição</label
                 >
                 <textarea
-                  id="descricaoTarefa"
                   class="form-control"
+                  id="descricaoTarefa"
                   rows="3"
-                  placeholder="Descrição da tarefa"
                 ></textarea>
               </div>
-
-              <div class="mb-3">
-                <label for="projetoSelect" class="form-label">Projeto</label>
-                <select id="projetoSelect" class="form-select" required>
-                  <option value="">Carregando projetos...</option>
-                </select>
-              </div>
-
               <div class="mb-3">
                 <label for="prioridadeTarefa" class="form-label"
                   >Prioridade</label
                 >
-                <select id="prioridadeTarefa" class="form-select" required>
-                  <option value="">Selecione a prioridade</option>
+                <select class="form-select" id="prioridadeTarefa">
                   <option value="baixa">Baixa</option>
-                  <option value="media">Média</option>
+                  <option value="média">Média</option>
                   <option value="alta">Alta</option>
                 </select>
               </div>
-
-              <button type="submit" class="btn btn-success w-100">
+              <div class="mb-3">
+                <label for="projetoSelect" class="form-label">Projeto</label>
+                <select class="form-select" id="projetoSelect" required>
+                  <option value="">Selecione um projeto</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
                 Salvar Tarefa
               </button>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       </div>
     </div>
 
-    <!-- ================= SCRIPTS ================= -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="api.js"></script>
-    <script src="tarefas.js"></script>
+    <!-- =================== MODAL DE EDIÇÃO DE TAREFA =================== -->
+    <div
+      class="modal fade"
+      id="modalEditarTarefa"
+      tabindex="-1"
+      aria-labelledby="modalEditarTarefaLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="editarTarefaForm">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalEditarTarefaLabel">
+                Editar Tarefa
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Fechar"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <input type="hidden" id="editarTarefaId" />
+              <div class="mb-3">
+                <label for="editarTituloTarefa" class="form-label"
+                  >Título</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editarTituloTarefa"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editarDescricaoTarefa" class="form-label"
+                  >Descrição</label
+                >
+                <textarea
+                  class="form-control"
+                  id="editarDescricaoTarefa"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label for="editarPrioridadeTarefa" class="form-label"
+                  >Prioridade</label
+                >
+                <select class="form-select" id="editarPrioridadeTarefa">
+                  <option value="baixa">Baixa</option>
+                  <option value="média">Média</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="editarProjetoSelect" class="form-label"
+                  >Projeto</label
+                >
+                <select class="form-select" id="editarProjetoSelect" required>
+                  <option value="">Selecione um projeto</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Salvar Alterações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- =================== SCRIPTS =================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/tarefas.js"></script>
   </body>
 </html>
