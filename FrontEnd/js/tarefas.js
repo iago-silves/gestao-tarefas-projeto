@@ -133,8 +133,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const tarefas = await apiRequest("/tarefa/listar", "GET");
       const tarefa = tarefas.find((t) => t.id == id);
       if (!tarefa) return alert("Tarefa não encontrada!");
-
-      // Preenche o formulário com os dados da tarefa
       document.getElementById("tituloTarefa").value = tarefa.titulo;
       document.getElementById("descricaoTarefa").value = tarefa.descricao;
       document.getElementById("projetoSelect").value = tarefa.projetoId;
