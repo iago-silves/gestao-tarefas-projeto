@@ -1,11 +1,11 @@
-// tarefas.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const tarefaForm = document.getElementById("tarefaForm");
   const tarefasContainer = document.getElementById("tarefasContainer");
   const projetoSelect = document.getElementById("projetoSelect");
 
-  // =============== CADASTRAR NOVA TAREFA ===============
+  let editandoTarefaId = null; // Armazena o ID da tarefa em edição
+
+  // =============== CADASTRAR / ATUALIZAR TAREFA ===============
   if (tarefaForm) {
     tarefaForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -16,23 +16,40 @@ document.addEventListener("DOMContentLoaded", () => {
       const prioridade = document.getElementById("prioridadeTarefa").value;
 
       try {
-        await apiRequest("/tarefa/cadastrar", "POST", {
-          titulo,
-          descricao,
-          projetoId,
-          prioridade,
-          percentual: 0,
-        });
+        if (editandoTarefaId) {
+          // Atualizar tarefa existente
+          await apiRequest(`/tarefa/atualizar/${editandoTarefaId}`, "PUT", {
+            titulo,
+            descricao,
+            projetoId,
+            prioridade,
+            percentual: 0,
+          });
 
-        alert("Tarefa cadastrada com sucesso!");
+          alert("Tarefa atualizada com sucesso!");
+          editandoTarefaId = null;
+        } else {
+          // Criar nova tarefa
+          await apiRequest("/tarefa/cadastrar", "POST", {
+            titulo,
+            descricao,
+            projetoId,
+            prioridade,
+            percentual: 0,
+          });
+
+          alert("Tarefa cadastrada com sucesso!");
+        }
+
         tarefaForm.reset();
         carregarTarefas();
       } catch (err) {
-        alert("Erro ao cadastrar tarefa: " + err);
+        alert("Erro ao salvar tarefa: " + err);
       }
     });
   }
 
+  // =============== CARREGAR PROJETOS NO SELECT ===============
   async function carregarProjetos() {
     if (!projetoSelect) return;
 
@@ -64,17 +81,84 @@ document.addEventListener("DOMContentLoaded", () => {
       tarefas.forEach((t) => {
         const div = document.createElement("div");
         div.className =
-          "tarefa-item p-2 border rounded mb-2 bg-white shadow-sm";
+          "tarefa-item p-3 border rounded mb-2 bg-white shadow-sm";
+
         div.innerHTML = `
-          <strong>${t.titulo}</strong> — ${t.status}<br>
-          <small>${t.descricao}</small>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <strong>${t.titulo}</strong> — <em>${
+          t.status || "Pendente"
+        }</em><br>
+              <small>${t.descricao || ""}</small>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary me-2 editar-btn" data-id="${
+                t.id
+              }">Editar</button>
+              <button class="btn btn-sm btn-danger excluir-btn" data-id="${
+                t.id
+              }">Excluir</button>
+            </div>
+          </div>
         `;
+
         tarefasContainer.appendChild(div);
       });
+
+      // Vincula eventos dos botões criados dinamicamente
+      document
+        .querySelectorAll(".editar-btn")
+        .forEach((btn) => btn.addEventListener("click", editarTarefa));
+      document
+        .querySelectorAll(".excluir-btn")
+        .forEach((btn) => btn.addEventListener("click", excluirTarefa));
     } catch (err) {
       tarefasContainer.innerHTML = `<p>Erro ao carregar tarefas.</p>`;
     }
   }
 
+  // =============== EDITAR TAREFA ===============
+  async function editarTarefa(e) {
+    const id = e.target.getAttribute("data-id");
+
+    try {
+      const tarefas = await apiRequest("/tarefa/listar", "GET");
+      const tarefa = tarefas.find((t) => t.id == id);
+      if (!tarefa) return alert("Tarefa não encontrada!");
+
+      // Preenche o formulário com os dados da tarefa
+      document.getElementById("tituloTarefa").value = tarefa.titulo;
+      document.getElementById("descricaoTarefa").value = tarefa.descricao;
+      document.getElementById("projetoSelect").value = tarefa.projetoId;
+      document.getElementById("prioridadeTarefa").value = tarefa.prioridade;
+
+      editandoTarefaId = id;
+
+      alert(
+        "Você está editando esta tarefa. Altere os campos e clique em 'Salvar'."
+      );
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      alert("Erro ao editar tarefa: " + err);
+    }
+  }
+
+  // =============== EXCLUIR TAREFA ===============
+  async function excluirTarefa(e) {
+    const id = e.target.getAttribute("data-id");
+
+    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) return;
+
+    try {
+      await apiRequest(`/tarefa/deletar/${id}`, "DELETE");
+      alert("Tarefa excluída com sucesso!");
+      carregarTarefas();
+    } catch (err) {
+      alert("Erro ao excluir tarefa: " + err);
+    }
+  }
+
+  // =============== INICIALIZAÇÃO ===============
+  carregarProjetos();
   carregarTarefas();
 });
