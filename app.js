@@ -216,7 +216,7 @@ app.delete("/projeto/deletar/:id", async (req, res) => {
 
 app.post("/tarefa/cadastrar", async (req, res) => {
     try {
-        const { titulo, descricao, projetoId, prioridade, percentual } = req.body;
+        const { titulo, descricao, projetoId, prioridade, percentual, status} = req.body;
 
         const tarefa = await Tarefa.create({
             titulo,
@@ -224,7 +224,7 @@ app.post("/tarefa/cadastrar", async (req, res) => {
             projetoId,
             prioridade,
             percentual,
-            status: "pendente"
+            status
         });
 
         await recalcularProgresso(projetoId);
@@ -257,7 +257,7 @@ app.get("/tarefa/projeto/:projetoId", async (req, res) => {
 
 app.put("/tarefa/atualizar/:id", async (req, res) => {
     try {
-        const { titulo, descricao, prioridade, percentual } = req.body;
+        const { titulo, descricao, prioridade, percentual, status} = req.body;
 
         const tarefa = await Tarefa.findByPk(req.params.id);
 
@@ -265,18 +265,12 @@ app.put("/tarefa/atualizar/:id", async (req, res) => {
             return res.status(404).send("Tarefa não encontrada");
         }
 
-        let novoStatus = tarefa.status;
-
-        if (percentual === 100) novoStatus = "concluida";
-        else if (percentual > 0) novoStatus = "em_progresso";
-        else novoStatus = "pendente";
-
         await tarefa.update({
             titulo,
             descricao,
             prioridade,
             percentual,
-            status: novoStatus
+            status
         });
 
         await recalcularProgresso(tarefa.projetoId);

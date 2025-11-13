@@ -10,8 +10,8 @@ const Tarefa = db.sequelize.define("Tarefa", {
         allowNull: true
     },
     status: {
-        type: db.Sequelize.ENUM("pendente", "em_progresso", "concluida"),
-        defaultValue: "pendente"
+        type: db.Sequelize.TEXT,
+        allowNull: true
     },
     responsavelId: {
         type: db.Sequelize.INTEGER,
