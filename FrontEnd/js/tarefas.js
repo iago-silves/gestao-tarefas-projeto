@@ -141,6 +141,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("prioridadeTarefa").value = tarefa.prioridade;
 
       editandoTarefaId = id;
+      const modalTitle = document.querySelector("#tarefaModal .modal-title");
+      if (modalTitle) modalTitle.textContent = "Editar Tarefa";
 
       // ✅ Abre o modal automaticamente
       if (tarefaModal) tarefaModal.show();
