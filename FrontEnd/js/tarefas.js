@@ -5,6 +5,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let editandoTarefaId = null; // Armazena o ID da tarefa em edição
 
+  // Referência ao modal Bootstrap
+  let tarefaModal;
+  const modalElement = document.getElementById("tarefaModal");
+  if (modalElement) {
+    tarefaModal = new bootstrap.Modal(modalElement);
+  }
+
   // =============== CADASTRAR / ATUALIZAR TAREFA ===============
   if (tarefaForm) {
     tarefaForm.addEventListener("submit", async (e) => {
@@ -42,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         tarefaForm.reset();
+        tarefaModal.hide(); // Fecha o modal após salvar
         carregarTarefas();
       } catch (err) {
         alert("Erro ao salvar tarefa: " + err);
@@ -105,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         tarefasContainer.appendChild(div);
       });
 
-      // Vincula eventos dos botões criados dinamicamente
+      // Vincula eventos
       document
         .querySelectorAll(".editar-btn")
         .forEach((btn) => btn.addEventListener("click", editarTarefa));
@@ -134,10 +142,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       editandoTarefaId = id;
 
-      alert(
-        "Você está editando esta tarefa. Altere os campos e clique em 'Salvar'."
-      );
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // ✅ Abre o modal automaticamente
+      if (tarefaModal) tarefaModal.show();
     } catch (err) {
       alert("Erro ao editar tarefa: " + err);
     }
