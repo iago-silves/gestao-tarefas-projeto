@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
             projetoId,
             prioridade,
             percentual: 0,
+            status: document.getElementById("statusTarefa").value,
           });
 
           alert("Tarefa atualizada com sucesso!");
@@ -43,6 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
             projetoId,
             prioridade,
             percentual: 0,
+            status: document.getElementById("statusTarefa").value,
           });
 
           alert("Tarefa cadastrada com sucesso!");
@@ -94,9 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
         div.innerHTML = `
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <strong>${t.titulo}</strong> — <em>${
-          t.status || "Pendente"
-        }</em><br>
+              <strong>${t.titulo}</strong> — <em>${t.status || ""}</em><br>
               <small>${t.descricao || ""}</small>
             </div>
             <div>
@@ -139,6 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("descricaoTarefa").value = tarefa.descricao;
       document.getElementById("projetoSelect").value = tarefa.projetoId;
       document.getElementById("prioridadeTarefa").value = tarefa.prioridade;
+      document.getElementById("statusTarefa").value = tarefa.status;
 
       editandoTarefaId = id;
       const modalTitle = document.querySelector("#tarefaModal .modal-title");
