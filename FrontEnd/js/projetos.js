@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.target.classList.contains("editar")) {
       try {
         // Pegamos todos os projetos e filtramos pelo ID (já que não existe rota /projeto/buscar)
-        const projetos = await apiRequest("/projeto/listar", "GET");
+        const projetos = await apiRequest("/projeto/atualizar/:id", "GET");
         const projeto = projetos.find((p) => p.id == id);
 
         if (!projeto) {
