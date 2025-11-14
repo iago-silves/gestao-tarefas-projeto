@@ -4,13 +4,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const projetoForm = document.getElementById("projetoForm");
   const projetosContainer = document.getElementById("projetosContainer");
 
-  // =============== CADASTRAR NOVO PROJETO ===============
+  const modalProjeto = document.getElementById("modalProjeto");
+  const modalProjetoLabel = document.getElementById("modalProjetoLabel");
+
+  const projetoIdInput = document.getElementById("projetoId");
+  const nomeProjetoInput = document.getElementById("nomeProjeto");
+  const descricaoProjetoInput = document.getElementById("descricaoProjeto");
+
+  // =========================================================
+  // BOTÃO "NOVO PROJETO" → LIMPAR MODAL
+  // =========================================================
+  document.getElementById("novoProjetoBtn").addEventListener("click", () => {
+    modalProjetoLabel.textContent = "Novo Projeto";
+    projetoIdInput.value = "";
+    projetoForm.reset();
+  });
+
+  // =========================================================
+  // SUBMETER FORMULÁRIO (CRIAR OU EDITAR)
+  // =========================================================
   if (projetoForm) {
     projetoForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const nome = document.getElementById("nomeProjeto").value;
-      const descricao = document.getElementById("descricaoProjeto").value;
+      const id = projetoIdInput.value;
+      const nome = nomeProjetoInput.value;
+      const descricao = descricaoProjetoInput.value;
       const usuarioEmail = localStorage.getItem("userEmail");
 
       if (!usuarioEmail) {
@@ -19,50 +38,80 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // busca o id do usuário pelo e-mail
+        // Buscar ID do usuário pelo email
         const usuarios = await apiRequest("/usuario/listar", "GET");
         const usuario = usuarios.find((u) => u.email === usuarioEmail);
 
         if (!usuario) {
-          alert("Usuário não encontrado no sistema.");
+          alert("Usuário não encontrado.");
           return;
         }
 
-        await apiRequest("/projeto/cadastrar", "POST", {
-          nome,
-          descricao,
-          usuarioId: usuario.id,
-        });
+        // -------------------------
+        // EDITAR
+        // -------------------------
+        if (id) {
+          await apiRequest(`/projeto/editar/${id}`, "PUT", {
+            nome,
+            descricao,
+            usuarioId: usuario.id,
+          });
 
-        alert("Projeto cadastrado com sucesso!");
+          alert("Projeto atualizado com sucesso!");
+        }
+        // -------------------------
+        // CRIAR
+        // -------------------------
+        else {
+          await apiRequest("/projeto/cadastrar", "POST", {
+            nome,
+            descricao,
+            usuarioId: usuario.id,
+          });
+
+          alert("Projeto cadastrado com sucesso!");
+        }
+
         projetoForm.reset();
+
+        // Fechar modal
+        bootstrap.Modal.getInstance(modalProjeto).hide();
+
         carregarProjetos();
       } catch (err) {
-        alert("Erro ao cadastrar projeto: " + err);
+        alert("Erro ao salvar projeto: " + err);
       }
     });
   }
 
-  // =============== LISTAR PROJETOS ===============
+  // =========================================================
+  // LISTAR PROJETOS
+  // =========================================================
   async function carregarProjetos() {
     if (!projetosContainer) return;
 
     try {
       const projetos = await apiRequest("/projeto/listar", "GET");
-
       projetosContainer.innerHTML = "";
 
       projetos.forEach((p) => {
         const div = document.createElement("div");
         div.className =
           "projeto-item p-3 border rounded mb-2 bg-light shadow-sm";
+
         div.innerHTML = `
           <h4>${p.nome}</h4>
           <p>${p.descricao}</p>
+
+          <button class="btn btn-sm btn-primary editar" data-id="${p.id}">
+            Editar
+          </button>
+
           <button class="btn btn-sm btn-danger deletar" data-id="${p.id}">
             Excluir
           </button>
         `;
+
         projetosContainer.appendChild(div);
       });
     } catch (err) {
@@ -72,10 +121,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   carregarProjetos();
 
-  // =============== DELETAR PROJETO ===============
+  // =========================================================
+  // EVENTOS: EDITAR & DELETAR
+  // =========================================================
   document.addEventListener("click", async (e) => {
+    const id = e.target.dataset.id;
+
+    // --------------------- EDITAR ---------------------
+    if (e.target.classList.contains("editar")) {
+      try {
+        const projeto = await apiRequest(`/projeto/buscar/${id}`, "GET");
+
+        modalProjetoLabel.textContent = "Editar Projeto";
+
+        projetoIdInput.value = projeto.id;
+        nomeProjetoInput.value = projeto.nome;
+        descricaoProjetoInput.value = projeto.descricao;
+
+        const modal = new bootstrap.Modal(modalProjeto);
+        modal.show();
+      } catch (err) {
+        alert("Erro ao carregar projeto para edição: " + err);
+      }
+    }
+
+    // --------------------- DELETAR ---------------------
     if (e.target.classList.contains("deletar")) {
-      const id = e.target.dataset.id;
       if (confirm("Tem certeza que deseja excluir este projeto?")) {
         await apiRequest(`/projeto/deletar/${id}`, "DELETE");
         alert("Projeto excluído!");
