@@ -22,7 +22,7 @@
         class="btn btn-success mb-3"
         id="novoProjetoBtn"
         data-bs-toggle="modal"
-        data-bs-target="#modalProjeto"
+        data-bs-target="#modalNovoProjeto"
       >
         + Novo Projeto
       </button>
@@ -30,19 +30,21 @@
       <div id="projetosContainer" class="row g-3"></div>
     </div>
 
-    <!-- Modal de Criar/Editar Projeto -->
+    <!-- Modal de Novo Projeto -->
     <div
       class="modal fade"
-      id="modalProjeto"
+      id="modalNovoProjeto"
       tabindex="-1"
-      aria-labelledby="modalProjetoLabel"
+      aria-labelledby="modalNovoProjetoLabel"
       aria-hidden="true"
     >
       <div class="modal-dialog">
         <div class="modal-content">
           <form id="projetoForm">
             <div class="modal-header">
-              <h5 class="modal-title" id="modalProjetoLabel">Novo Projeto</h5>
+              <h5 class="modal-title" id="modalNovoProjetoLabel">
+                Novo Projeto
+              </h5>
               <button
                 type="button"
                 class="btn-close"
@@ -50,11 +52,7 @@
                 aria-label="Fechar"
               ></button>
             </div>
-
             <div class="modal-body">
-              <!-- Campo oculto, necessário para saber quando é edição -->
-              <input type="hidden" id="projetoId" />
-
               <div class="mb-3">
                 <label for="nomeProjeto" class="form-label"
                   >Nome do Projeto</label
@@ -66,7 +64,6 @@
                   required
                 />
               </div>
-
               <div class="mb-3">
                 <label for="descricaoProjeto" class="form-label"
                   >Descrição</label
@@ -78,7 +75,6 @@
                 ></textarea>
               </div>
             </div>
-
             <div class="modal-footer">
               <button
                 type="button"
@@ -87,7 +83,9 @@
               >
                 Cancelar
               </button>
-              <button type="submit" class="btn btn-primary">Salvar</button>
+              <button type="submit" class="btn btn-primary">
+                Salvar Projeto
+              </button>
             </div>
           </form>
         </div>
