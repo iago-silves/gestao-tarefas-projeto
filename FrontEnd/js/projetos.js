@@ -4,79 +4,54 @@ document.addEventListener("DOMContentLoaded", () => {
   const projetoForm = document.getElementById("projetoForm");
   const projetosContainer = document.getElementById("projetosContainer");
 
-  const modalProjeto = document.getElementById("modalProjeto");
-  const modalProjetoLabel = document.getElementById("modalProjetoLabel");
+  let editandoProjetoId = null; // controla edição
 
-  const projetoIdInput = document.getElementById("projetoId");
-  const nomeProjetoInput = document.getElementById("nomeProjeto");
-  const descricaoProjetoInput = document.getElementById("descricaoProjeto");
+  // Referência ao modal
+  let projetoModal;
+  const modalElement = document.getElementById("modalNovoProjeto");
+  if (modalElement) {
+    projetoModal = new bootstrap.Modal(modalElement);
+  }
 
-  // =========================================================
-  // BOTÃO "NOVO PROJETO" → LIMPAR MODAL
-  // =========================================================
-  document.getElementById("novoProjetoBtn").addEventListener("click", () => {
-    modalProjetoLabel.textContent = "Novo Projeto";
-    projetoIdInput.value = "";
-    projetoForm.reset();
-  });
-
-  // =========================================================
-  // SUBMETER FORMULÁRIO (CRIAR OU EDITAR)
-  // =========================================================
+  // =============== CADASTRAR OU EDITAR PROJETO ===============
   if (projetoForm) {
     projetoForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const id = projetoIdInput.value;
-      const nome = nomeProjetoInput.value;
-      const descricao = descricaoProjetoInput.value;
+      const nome = document.getElementById("nomeProjeto").value;
+      const descricao = document.getElementById("descricaoProjeto").value;
       const usuarioEmail = localStorage.getItem("userEmail");
 
-      if (!usuarioEmail) {
-        alert("Usuário não logado!");
-        return;
-      }
-
       try {
-        // Buscar ID do usuário pelo email
+        // Obter usuário
         const usuarios = await apiRequest("/usuario/listar", "GET");
         const usuario = usuarios.find((u) => u.email === usuarioEmail);
 
-        if (!usuario) {
-          alert("Usuário não encontrado.");
-          return;
-        }
+        if (!usuario) return alert("Usuário não encontrado!");
 
-        // -------------------------
-        // EDITAR
-        // -------------------------
-        if (id) {
-          await apiRequest(`/projeto/editar/${id}`, "PUT", {
+        if (editandoProjetoId) {
+          // ========== ATUALIZAR ==========
+          await apiRequest(`/projeto/atualizar/${editandoProjetoId}`, "PUT", {
             nome,
             descricao,
             usuarioId: usuario.id,
           });
 
           alert("Projeto atualizado com sucesso!");
-        }
-        // -------------------------
-        // CRIAR
-        // -------------------------
-        else {
+          editandoProjetoId = null;
+        } else {
+          // =========== CRIAR ============
           await apiRequest("/projeto/cadastrar", "POST", {
             nome,
             descricao,
             usuarioId: usuario.id,
           });
 
-          alert("Projeto cadastrado com sucesso!");
+          alert("Projeto criado com sucesso!");
         }
 
         projetoForm.reset();
-
-        // Fechar modal
-        bootstrap.Modal.getInstance(modalProjeto).hide();
-
+        projetoModal.hide();
         carregarProjetos();
       } catch (err) {
         alert("Erro ao salvar projeto: " + err);
@@ -84,21 +59,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =========================================================
-  // LISTAR PROJETOS
-  // =========================================================
+  // =============== LISTAR PROJETOS ===============
   async function carregarProjetos() {
-    if (!projetosContainer) return;
-
     try {
       const projetos = await apiRequest("/projeto/listar", "GET");
+
       projetosContainer.innerHTML = "";
 
       projetos.forEach((p) => {
         const div = document.createElement("div");
         div.className =
           "projeto-item p-3 border rounded mb-2 bg-light shadow-sm";
-
         div.innerHTML = `
           <h4>${p.nome}</h4>
           <p>${p.descricao}</p>
@@ -121,43 +92,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   carregarProjetos();
 
-  // =========================================================
-  // EVENTOS: EDITAR & DELETAR
-  // =========================================================
+  // =============== CLICKS (EDITAR / DELETAR) ===============
   document.addEventListener("click", async (e) => {
-    const id = e.target.dataset.id;
-
-    // --------------------- EDITAR ---------------------
-    if (e.target.classList.contains("editar")) {
-      try {
-        // Pegamos todos os projetos e filtramos pelo ID (já que não existe rota /projeto/buscar)
-        const projetos = await apiRequest("/projeto/atualizar/:id", "GET");
-        const projeto = projetos.find((p) => p.id == id);
-
-        if (!projeto) {
-          alert("Projeto não encontrado!");
-          return;
-        }
-
-        modalProjetoLabel.textContent = "Editar Projeto";
-
-        projetoIdInput.value = projeto.id;
-        nomeProjetoInput.value = projeto.nome;
-        descricaoProjetoInput.value = projeto.descricao;
-
-        const modal = new bootstrap.Modal(modalProjeto);
-        modal.show();
-      } catch (err) {
-        alert("Erro ao carregar projeto para edição: " + err);
-      }
-    }
-
-    // --------------------- DELETAR ---------------------
+    // ------------ DELETAR ------------
     if (e.target.classList.contains("deletar")) {
-      if (confirm("Tem certeza que deseja excluir este projeto?")) {
+      const id = e.target.dataset.id;
+      if (confirm("Tem certeza que deseja excluir?")) {
         await apiRequest(`/projeto/deletar/${id}`, "DELETE");
         alert("Projeto excluído!");
         carregarProjetos();
+      }
+    }
+
+    // ------------ EDITAR ------------
+    if (e.target.classList.contains("editar")) {
+      const id = e.target.dataset.id;
+
+      try {
+        const projeto = await apiRequest(`/projeto/${id}`, "GET");
+
+        document.getElementById("nomeProjeto").value = projeto.nome;
+        document.getElementById("descricaoProjeto").value = projeto.descricao;
+
+        // Mudar título do modal
+        const tituloModal = document.querySelector("#modalNovoProjetoLabel");
+        if (tituloModal) tituloModal.textContent = "Editar Projeto";
+
+        editandoProjetoId = id;
+        projetoModal.show();
+      } catch (err) {
+        alert("Erro ao carregar projeto para edição: " + err);
       }
     }
   });
