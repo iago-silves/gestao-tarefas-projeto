@@ -130,7 +130,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // --------------------- EDITAR ---------------------
     if (e.target.classList.contains("editar")) {
       try {
-        const projeto = await apiRequest(`/projeto/buscar/${id}`, "GET");
+        // Pegamos todos os projetos e filtramos pelo ID (já que não existe rota /projeto/buscar)
+        const projetos = await apiRequest("/projeto/listar", "GET");
+        const projeto = projetos.find((p) => p.id == id);
+
+        if (!projeto) {
+          alert("Projeto não encontrado!");
+          return;
+        }
 
         modalProjetoLabel.textContent = "Editar Projeto";
 
