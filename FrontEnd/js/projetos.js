@@ -1,10 +1,7 @@
-// projetos.js
-
 document.addEventListener("DOMContentLoaded", () => {
   const projetoForm = document.getElementById("projetoForm");
   const projetosContainer = document.getElementById("projetosContainer");
 
-  // =============== CADASTRAR NOVO PROJETO ===============
   if (projetoForm) {
     projetoForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -19,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       try {
-        // busca o id do usuário pelo e-mail
         const usuarios = await apiRequest("/usuario/listar", "GET");
         const usuario = usuarios.find((u) => u.email === usuarioEmail);
 
@@ -43,7 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =============== LISTAR PROJETOS ===============
   async function carregarProjetos() {
     if (!projetosContainer) return;
 
@@ -72,7 +67,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   carregarProjetos();
 
-  // =============== DELETAR PROJETO ===============
   document.addEventListener("click", async (e) => {
     if (e.target.classList.contains("deletar")) {
       const id = e.target.dataset.id;

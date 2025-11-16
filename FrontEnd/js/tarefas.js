@@ -3,16 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const tarefasContainer = document.getElementById("tarefasContainer");
   const projetoSelect = document.getElementById("projetoSelect");
 
-  let editandoTarefaId = null; // Armazena o ID da tarefa em edição
+  let editandoTarefaId = null;
 
-  // Referência ao modal Bootstrap
   let tarefaModal;
   const modalElement = document.getElementById("tarefaModal");
   if (modalElement) {
     tarefaModal = new bootstrap.Modal(modalElement);
   }
 
-  // =============== CADASTRAR / ATUALIZAR TAREFA ===============
   if (tarefaForm) {
     tarefaForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -24,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const status = document.getElementById("statusTarefa").value;
       try {
         if (editandoTarefaId) {
-          // Atualizar tarefa existente
           await apiRequest(`/tarefa/atualizar/${editandoTarefaId}`, "PUT", {
             titulo,
             descricao,
@@ -37,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
           alert("Tarefa atualizada com sucesso!");
           editandoTarefaId = null;
         } else {
-          // Criar nova tarefa
           await apiRequest("/tarefa/cadastrar", "POST", {
             titulo,
             descricao,
@@ -51,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         tarefaForm.reset();
-        tarefaModal.hide(); // Fecha o modal após salvar
+        tarefaModal.hide();
         carregarTarefas();
       } catch (err) {
         alert("Erro ao salvar tarefa: " + err);
@@ -59,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // =============== CARREGAR PROJETOS NO SELECT ===============
   async function carregarProjetos() {
     if (!projetoSelect) return;
 
@@ -79,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =============== LISTAR TAREFAS ===============
   async function carregarTarefas() {
     if (!tarefasContainer) return;
 
@@ -113,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tarefasContainer.appendChild(div);
       });
 
-      // Vincula eventos
       document
         .querySelectorAll(".editar-btn")
         .forEach((btn) => btn.addEventListener("click", editarTarefa));
@@ -125,7 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =============== EDITAR TAREFA ===============
   async function editarTarefa(e) {
     const id = e.target.getAttribute("data-id");
 
@@ -143,14 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const modalTitle = document.querySelector("#tarefaModal .modal-title");
       if (modalTitle) modalTitle.textContent = "Editar Tarefa";
 
-      // ✅ Abre o modal automaticamente
       if (tarefaModal) tarefaModal.show();
     } catch (err) {
       alert("Erro ao editar tarefa: " + err);
     }
   }
 
-  // =============== EXCLUIR TAREFA ===============
   async function excluirTarefa(e) {
     const id = e.target.getAttribute("data-id");
 
@@ -165,7 +155,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // =============== INICIALIZAÇÃO ===============
   carregarProjetos();
   carregarTarefas();
 });

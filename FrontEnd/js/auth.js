@@ -1,10 +1,8 @@
-// ==================== LOGIN ====================
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Pegando valores dos campos corretamente
     const emailValue = document.getElementById("email").value;
     const senhaValue = document.getElementById("senha").value;
 
@@ -27,13 +25,11 @@ if (loginForm) {
   });
 }
 
-// ==================== CADASTRO ====================
 const cadastroForm = document.getElementById("cadastroForm");
 if (cadastroForm) {
   cadastroForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Pegando valores corretamente
     const nomeValue = document.getElementById("nome").value;
     const emailValue = document.getElementById("email").value;
     const senhaValue = document.getElementById("senha").value;
@@ -57,7 +53,6 @@ if (cadastroForm) {
   });
 }
 
-// ==================== LOGOUT ====================
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
   logoutBtn.addEventListener("click", () => {
@@ -66,7 +61,6 @@ if (logoutBtn) {
   });
 }
 
-// ==================== EXIBIR NOME NA DASHBOARD ====================
 const userName = document.getElementById("userName");
 if (userName) {
   const email = localStorage.getItem("userEmail");

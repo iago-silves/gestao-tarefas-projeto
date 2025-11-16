@@ -11,7 +11,6 @@ async function apiRequest(endpoint, method = "GET", data = null) {
 
     const response = await fetch(`http://localhost:8081${endpoint}`, options);
 
-    // Lê o corpo apenas uma vez
     const contentType = response.headers.get("content-type");
     let responseData;
 
